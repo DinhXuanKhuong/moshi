@@ -167,6 +167,7 @@ cython_debug/
 *~
 *.safetensors
 *.wav
+!/demos/moshi-audio-trace/sample.wav
 trace*.json
 *.flac
 pkg

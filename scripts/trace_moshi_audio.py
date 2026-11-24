@@ -96,6 +96,8 @@ def main() -> None:
         parser.error("--moshi and --tokenizer must be supplied together")
     if args.tail_frames < 0 or args.print_frames < 0 or args.threads < 1:
         parser.error("frame counts must be nonnegative and threads must be positive")
+    if not args.input.is_file():
+        parser.error(f"Input audio file not found: {args.input}. Pass an existing audio file with --input.")
 
     torch.set_num_threads(args.threads)
     torch.manual_seed(0)
