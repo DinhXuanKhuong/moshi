@@ -1,0 +1,33 @@
+{
+  "schema_version": 1,
+  "diagram_type": "dataflow",
+  "meta": {
+    "title": "How Moshi turns incoming speech into a reply",
+    "locale": "en",
+    "quality_profile": "showcase",
+    "viewBox": [1070, 510]
+  },
+  "stages": [
+    {"label": "Capture"}, {"label": "Encode"}, {"label": "Time"}, {"label": "Depth"}, {"label": "Playback"}
+  ],
+  "nodes": [
+    {"id":"pcm","type":"frontend","label":"User audio","sublabel":"24 kHz mono","stage":0,"row":1},
+    {"id":"encode","type":"backend","label":"Mimi encoder","sublabel":"SEANet, attention, RVQ","stage":1,"row":1},
+    {"id":"temporal","type":"backend","label":"Temporal Transformer","sublabel":"Rolling conversation state","stage":2,"row":1,"width":176},
+    {"id":"depth","type":"backend","label":"Depformer","sublabel":"8 codebooks","stage":3,"row":1},
+    {"id":"decoder","type":"backend","label":"Mimi decoder","sublabel":"Rebuilds PCM","stage":4,"row":1},
+    {"id":"pieces","type":"frontend","label":"Text stream","sublabel":"SentencePiece pieces","stage":2,"row":0}
+  ],
+  "flows": [
+    {"from":"pcm","to":"encode","label":"1,920 samples","variant":"emphasis"},
+    {"from":"encode","to":"temporal","label":"8 user IDs","variant":"emphasis"},
+    {"from":"temporal","to":"depth","label":"State + ID","variant":"emphasis"},
+    {"from":"depth","to":"decoder","label":"8 aligned IDs","variant":"emphasis"},
+    {"from":"temporal","to":"pieces","label":"Text ID","fromSide":"top","toSide":"bottom"}
+  ],
+  "cards": [
+    {"dot":"cyan","title":"An 80 ms clock","items":["Mimi consumes 1,920 waveform samples and emits eight user codebook IDs per frame."]},
+    {"dot":"violet","title":"Two axes of generation","items":["The temporal model carries history across frames. The Depformer predicts successive codebook IDs within a step."]},
+    {"dot":"emerald","title":"Delay alignment","items":["LMGen aligns text and audio streams before handing the audio IDs to the streaming Mimi decoder."]}
+  ]
+}
